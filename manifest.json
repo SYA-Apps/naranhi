@@ -1,11 +1,11 @@
 {
-    "name": "책일기",
-    "short_name": "책일기",
+    "name": "나란히 - 함께 쓰는 독서 책장",
+    "short_name": "나란히",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "읽은 책을 책장에 꽂아 두는 독서기록 앱",
+    "description": "함께 쓰는 독서 책장. 읽은 책을 꽂고, 오늘 진도를 친구와 나눈다",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
