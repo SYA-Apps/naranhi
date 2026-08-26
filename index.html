@@ -52,6 +52,20 @@
 </head>
 <body>
   <!--
+    이전 빌드가 등록해 둔 서비스워커를 지운다. 나란히는 서비스워커를 끄고
+    빌드하는데(--pwa-strategy=none), 이미 아이폰 홈화면에 추가된 사람은 그 전에
+    등록된 서비스워커가 여전히 남아 있어 새 배포가 안 보이는 문제가 이어진다.
+    한 번 지우면 그다음부터는 애초에 등록이 안 되니 이 코드도 할 일이 없어진다.
+  -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations()
+        .then((regs) => regs.forEach((reg) => reg.unregister()))
+        .catch(() => {});
+    }
+  </script>
+
+  <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader
     or to give the user feedback during the initialization process.
