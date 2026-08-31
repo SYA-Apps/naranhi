@@ -5,11 +5,16 @@
   앱·웹의 "앱 추천하기" 가 이 주소(AppInfo.getUrl) 하나를 공유 시트로 보낸다.
   친구는 여기서 자기 기기를 고른다:
     - 갤럭시(안드로이드) → 구글 플레이 스토어
-    - 아이폰            → 웹으로 열고 "홈 화면에 추가"
+    - 아이폰 · PC       → 웹으로 열고(아이폰은 "홈 화면에 추가")
 
-  **아이폰 앱이 나오면**: 아래 IOS_URL 을 App Store 주소로만 바꾸면 된다(그 한 곳).
-  **플레이 출시 전**: 플레이 주소는 아직 열리지 않는다. 그래서 누구나 지금 바로
-  쓸 수 있는 "웹으로 바로 시작" 을 함께 둔다.
+  **아이폰 앱이 나오면**: 아래 아이폰 버튼의 href 를 App Store 주소로만 바꾸면 된다.
+  그때는 PC 를 이 버튼에서 떼어 내야 한다 — 지금 둘이 한 줄인 건 갈 곳이 같아서다.
+
+  **길은 딱 둘만 둔다(2026-08-31).** 예전엔 맨 아래 "기기 상관없이 · 웹으로 바로
+  시작하기" 링크가 하나 더 있었는데 뺐다. 출시 전에는 플레이 주소가 안 열려서 그게
+  유일한 길이었지만, 정식 출시(08-18) 뒤로는 **설치를 우회하는 샛길**이 된다.
+  갤럭시 사용자가 그걸 누르면 앱을 안 깔고 웹만 쓰고 끝난다 — 설치수도, 다시
+  돌아올 확률도 잃는다. 고를 것이 적어야 고른다.
 
   privacy.html·delete-account.html 과 같은 자리(스타일도 같은 레몬크림·잉크).
   `flutter build web` 이 그대로 복사하므로 배포 한 번이면 아래로 공개된다.
@@ -65,11 +70,6 @@
     .btn .label { font-weight: 700; font-size: 1.05rem; }
     .btn .note { color: rgba(74, 59, 54, .6); font-size: .82rem; }
     .btn .col { display: flex; flex-direction: column; }
-    .web {
-      display: inline-block; margin-top: 8px;
-      color: #7A5C50; font-weight: 700; text-decoration: none;
-      border-bottom: 1.5px solid rgba(122, 92, 80, .4);
-    }
     .foot {
       margin-top: 30px; font-size: .85rem;
       color: rgba(74, 59, 54, .6);
@@ -89,7 +89,7 @@
   <h1>나란히</h1>
   <p class="sub">함께 쓰는 독서 책장</p>
 
-  <!-- 갤럭시(안드로이드) → 구글 플레이. 출시 전에는 열리지 않는다. -->
+  <!-- 갤럭시(안드로이드) → 구글 플레이. 2026-08-18 정식 출시로 열려 있다. -->
   <a class="btn" href="https://play.google.com/store/apps/details?id=app.sya.reading_log">
     <span class="emoji">🤖</span>
     <span class="col">
@@ -98,16 +98,15 @@
     </span>
   </a>
 
-  <!-- 아이폰 → 웹으로. iOS 앱이 나오면 이 href 만 App Store 주소로 바꾼다. -->
+  <!-- 아이폰·PC → 웹으로. 둘의 갈 곳이 같아서 한 줄로 묶었다(같은 웹 나란히).
+       iOS 앱이 나오면 이 href 만 App Store 주소로 바꾸고 PC 는 따로 떼어 낸다. -->
   <a class="btn" href="./">
-    <span class="emoji">🍎</span>
+    <span class="emoji">🌐</span>
     <span class="col">
-      <span class="label">아이폰</span>
-      <span class="note">웹으로 열고 홈 화면에 추가</span>
+      <span class="label">아이폰 · PC</span>
+      <span class="note">설치 없이 웹으로 바로 쓰기</span>
     </span>
   </a>
-
-  <a class="web" href="./">기기 상관없이 · 웹으로 바로 시작하기 →</a>
 
   <div class="ios-tip">
     <strong>아이폰에서 앱처럼 쓰기</strong><br>
