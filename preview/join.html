@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<!--
+  나란히 초대 링크 — 초대 문구(shareRoomInvite, room_shelf_screen.dart)가 보내는 주소.
+    https://sya-apps.github.io/naranhi/join.html?code=XXXXXX
+
+  1) naranhi://join?code=XXXXXX 로 먼저 열어 본다 — 앱이 깔려 있으면 곧장 그 방으로.
+  2) 잠깐(1.2초) 기다려도 이 페이지가 그대로 보이면 앱이 없다고 보고
+     ./?code=XXXXXX (진짜 웹 나란히, main_web_real.dart) 로 물러난다.
+     거기서 같은 코드를 읽어 똑같이 자동으로 들어가기를 시도한다
+     (InviteLink.codeFrom, bookshelf_screen.dart).
+
+  Android App Links(도메인 인증)까지는 아직 안 걸었다(lib/config/app_info.dart 의
+  joinUrl 주석 참고) — 그래서 "탭하면 무조건 앱"이 아니라 이 자바스크립트
+  다리를 하나 거친다.
+
+  get.html·privacy.html 과 같은 자리(레몬크림·잉크 스타일도 같다).
+-->
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>나란히 초대</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <style>
+    :root {
+      --cream: #FBF3D6;
+      --paper: #FFFDF5;
+      --ink: #4A3B36;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 72px 18px;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, "Apple SD Gothic Neo",
+                   "Malgun Gothic", sans-serif;
+      line-height: 1.7;
+      word-break: keep-all;
+      text-align: center;
+    }
+    main { max-width: 380px; margin: 0 auto; }
+    .icon {
+      width: 72px; height: 72px;
+      border-radius: 18px;
+      border: 1.5px solid var(--ink);
+      display: block; margin: 0 auto 18px;
+    }
+    h1 { font-size: 1.25rem; margin: 0 0 8px; }
+    p { color: rgba(74, 59, 54, .7); margin: 0 0 28px; }
+    a.btn {
+      display: inline-block;
+      text-decoration: none;
+      color: var(--ink);
+      background: var(--paper);
+      border: 1.5px solid var(--ink);
+      border-radius: 14px;
+      padding: 14px 24px;
+      font-weight: 700;
+    }
+    a.btn:active { transform: translateY(1px); }
+  </style>
+</head>
+<body>
+<main>
+  <img class="icon" src="icons/Icon-192.png" alt="나란히 아이콘">
+  <h1 id="title">공유 책장으로 들어가는 중이에요</h1>
+  <p id="msg">잠깐만요, 나란히 앱을 열어 볼게요…</p>
+  <a class="btn" id="fallback" href="./">웹으로 계속하기</a>
+</main>
+<script>
+  (function () {
+    var code = new URLSearchParams(location.search).get('code');
+    var fallback = document.getElementById('fallback');
+
+    if (!code) {
+      document.getElementById('title').textContent = '초대코드가 없어요';
+      document.getElementById('msg').textContent = '받은 링크를 다시 확인해 주세요.';
+      return;
+    }
+
+    var fallbackUrl = './?code=' + encodeURIComponent(code);
+    fallback.href = fallbackUrl;
+
+    // 앱이 열리면 이 탭은 백그라운드로 밀려나고, 아래 타이머가 나중에 돌아도
+    // document.visibilityState 가 더는 'visible' 이 아니라 웹으로 밀어내지 않는다.
+    // 앱이 없으면(또는 못 열면) 화면은 계속 보이는 채고, 타이머가 웹으로 데려간다.
+    window.location.href = 'naranhi://join?code=' + encodeURIComponent(code);
+    setTimeout(function () {
+      if (document.visibilityState === 'visible') {
+        window.location.replace(fallbackUrl);
+      }
+    }, 1200);
+  })();
+</script>
+</body>
+</html>
