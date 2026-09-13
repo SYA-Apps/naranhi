@@ -2,6 +2,14 @@
 <html>
 <head>
   <!--
+    🛡️ 주소가 빗금 둘(`//naranhi/`)로 열리면 바른 주소로 다시 연다 — **맨 위에 있어야 한다.**
+    Flutter 가 `//naranhi/` 를 «다른 사이트» 로 읽어 history.replaceState 에서 SecurityError 로
+    멈추고 **회색 화면**만 남는다. 2026-09-11 아이폰에서 소담 대문을 거쳐 들어오다 실제로 그랬다
+    (대문은 고쳤지만 다른 곳에서 `//` 링크로 들어와도 스스로 막는다).
+    경위: C:\SYA\playbook\함정-모음.md 2026-09-11 «빗금이 두 개».
+  -->
+  <script>if(location.pathname.indexOf('//')===0)location.replace(location.pathname.replace(/^\/+/,'/')+location.search+location.hash);</script>
+  <!--
     If you are serving your web app in a path other than the root, change the
     href value below to reflect the base path you are serving from.
 
@@ -56,11 +64,18 @@
     빌드하는데(--pwa-strategy=none), 이미 아이폰 홈화면에 추가된 사람은 그 전에
     등록된 서비스워커가 여전히 남아 있어 새 배포가 안 보이는 문제가 이어진다.
     한 번 지우면 그다음부터는 애초에 등록이 안 되니 이 코드도 할 일이 없어진다.
+
+    🚨 **나란히 것만 지운다.** getRegistrations() 는 이 앱이 아니라 `sya-apps.github.io`
+    **전체**의 서비스워커를 준다. 거르지 않으면 이웃 앱(쿵짝·사랑나라 — 둘 다 오프라인에
+    서비스워커를 쓴다)까지 지워서, 나란히 웹을 한 번 열면 옆 앱들의 오프라인이 풀린다
+    (2026-09-11 ADMIN 발견).
   -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations()
-        .then((regs) => regs.forEach((reg) => reg.unregister()))
+        .then((regs) => regs
+          .filter((reg) => reg.scope.includes('/naranhi/'))
+          .forEach((reg) => reg.unregister()))
         .catch(() => {});
     }
   </script>
