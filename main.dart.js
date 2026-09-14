@@ -34674,20 +34674,21 @@ b_p:function b_p(a){this.a=a},
 b_q:function b_q(a,b){this.a=a
 this.b=b},
 S6(a,b){return A.bEy(a,b)},
-bEy(a,b){var s=0,r=A.p(t.H),q,p=2,o=[],n,m,l,k
+bEy(a,b){var s=0,r=A.p(t.H),q,p=2,o=[],n,m,l,k,j
 var $async$S6=A.l(function(c,d){if(c===1){o.push(d)
 s=p}for(;;)switch(s){case 0:m=b.c
-l='[\ub098\ub780\ud788] "'+b.b+'" \ucc45\uc7a5\uc5d0 \ucd08\ub300\ud560\uac8c\uc694.\n\uc544\ub798 \ub9c1\ud06c\ub97c \ub204\ub974\uba74 \uace7\ubc14\ub85c \ub4e4\uc5b4\uc640\uc694 (\ucd08\ub300\ucf54\ub4dc '+m+").\n"+("https://sya-apps.github.io/naranhi/join.html?code="+m)
+l="https://sya-apps.github.io/naranhi/join.html?code="+m
+k='[\ub098\ub780\ud788] "'+b.b+'" \ucc45\uc7a5\uc5d0 \ucd08\ub300\ud560\uac8c\uc694. (\ucd08\ub300\ucf54\ub4dc '+m+")\n\n\ud83d\udcf1 \uc548\ub4dc\ub85c\uc774\ub4dc \uc571\uc73c\ub85c \ubc14\ub85c \ub4e4\uc5b4\uac00\uae30\n"+l+"\n\n\ud83c\udf10 \uc6f9(\uc544\uc774\ud3f0\xb7PC)\uc73c\ub85c \ubc14\ub85c \ub4e4\uc5b4\uac00\uae30\n"+(l+"&to=web")
 p=4
 s=7
-return A.i($.b9Q().jC(0,A.bf8(l)),$async$S6)
+return A.i($.b9Q().jC(0,A.bf8(k)),$async$S6)
 case 7:p=2
 s=6
 break
 case 4:p=3
-k=o.pop()
+j=o.pop()
 s=8
-return A.i(A.oc(new A.lt(l)),$async$S6)
+return A.i(A.oc(new A.lt(k)),$async$S6)
 case 8:if(a.e==null){s=1
 break}a.an(t.J).f.dr(B.aoi)
 s=6

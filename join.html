@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <!--
-  나란히 초대 링크 — 초대 문구(shareRoomInvite, room_shelf_screen.dart)가 보내는 주소.
-    https://sya-apps.github.io/naranhi/join.html?code=XXXXXX
+  나란히 초대 링크 — 초대 문구(inviteShareText, room_shelf_screen.dart)가 보내는 두 줄.
+    https://sya-apps.github.io/naranhi/join.html?code=XXXXXX          📱 안드로이드 앱으로
+    https://sya-apps.github.io/naranhi/join.html?code=XXXXXX&to=web   🌐 웹(아이폰·PC)으로
 
-  1) naranhi://join?code=XXXXXX 로 먼저 열어 본다 — 앱이 깔려 있으면 곧장 그 방으로.
-  2) 잠깐(1.2초) 기다려도 이 페이지가 그대로 보이면 앱이 없다고 보고
-     ./?code=XXXXXX (진짜 웹 나란히, main_web_real.dart) 로 물러난다.
-     거기서 같은 코드를 읽어 똑같이 자동으로 들어가기를 시도한다
-     (InviteLink.codeFrom, bookshelf_screen.dart).
+  소담 앱 공통 규칙(C:\SYA\playbook\templates\초대링크-규칙.md, 2026-09-14) 템플릿을 나란히 모양으로 옮겼다.
+  - 안드로이드 → intent://join?code=… 로 앱을 연다. 카톡 안 브라우저는 맨 naranhi:// 를 막거나 무시할 때가
+    있어서 intent:// 를 쓴다(크롬·카톡 둘 다 받는다. package= 가 있어 엉뚱한 앱이 열리지 않는다).
+    앱이 없으면 플레이스토어로 — 설치 뒤 링크를 한 번 더 누르면 들어온다.
+  - 아이폰·PC·to=web → 곧장 웹 ./?code=… (진짜 웹 나란히, main_web_real.dart). 웹이 같은 코드를 읽어
+    그 방으로 들어간다(InviteLink.codeFrom, bookshelf_screen.dart).
+  - 1.5초 뒤에도 이 화면이 보이면(아무것도 안 열림) 버튼 둘 — 앱 받기 · 웹으로 계속.
+  - og 태그: 카톡이 **첫 링크**로 미리보기 카드를 만든다. og:image·og:url 은 반드시 절대 주소.
 
-  Android App Links(도메인 인증)까지는 아직 안 걸었다(lib/config/app_info.dart 의
-  joinUrl 주석 참고) — 그래서 "탭하면 무조건 앱"이 아니라 이 자바스크립트
-  다리를 하나 거친다.
-
+  Android App Links(도메인 인증)까지는 아직 안 걸었다(규칙 5절 «나중에», lib/config/app_info.dart joinUrl 주석).
   get.html·privacy.html 과 같은 자리(레몬크림·잉크 스타일도 같다).
 -->
 <html lang="ko">
@@ -20,6 +21,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>나란히 초대</title>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="나란히">
+  <meta property="og:title" content="나란히 초대">
+  <meta property="og:description" content="친구의 공유 책장으로 초대받았어요. 누르면 바로 들어가요 · 안드로이드는 앱으로, 아이폰·PC는 웹으로">
+  <meta property="og:image" content="https://sya-apps.github.io/naranhi/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="나란히 — 책 네 권이 선 책장">
+  <meta property="og:url" content="https://sya-apps.github.io/naranhi/join.html">
+  <meta property="og:locale" content="ko_KR">
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
   <style>
@@ -48,9 +59,12 @@
       display: block; margin: 0 auto 18px;
     }
     h1 { font-size: 1.25rem; margin: 0 0 8px; }
-    p { color: rgba(74, 59, 54, .7); margin: 0 0 28px; }
+    p { color: rgba(74, 59, 54, .7); margin: 0 0 24px; }
+    .code { font-size: 1.3rem; font-weight: 700; letter-spacing: .12em; margin: 0 0 24px; }
     a.btn {
-      display: inline-block;
+      display: block;
+      max-width: 280px;
+      margin: 0 auto 12px;
       text-decoration: none;
       color: var(--ink);
       background: var(--paper);
@@ -60,6 +74,7 @@
       font-weight: 700;
     }
     a.btn:active { transform: translateY(1px); }
+    [hidden] { display: none !important; }
   </style>
 </head>
 <body>
@@ -67,31 +82,54 @@
   <img class="icon" src="icons/Icon-192.png" alt="나란히 아이콘">
   <h1 id="title">공유 책장으로 들어가는 중이에요</h1>
   <p id="msg">잠깐만요, 나란히 앱을 열어 볼게요…</p>
-  <a class="btn" id="fallback" href="./">웹으로 계속하기</a>
+  <div class="code" id="code" hidden></div>
+  <a class="btn" id="getApp" hidden>나란히 앱 받기</a>
+  <a class="btn" id="toWeb" href="./" hidden>웹으로 계속하기</a>
 </main>
 <script>
   (function () {
-    var code = new URLSearchParams(location.search).get('code');
-    var fallback = document.getElementById('fallback');
+    var APP = {
+      scheme: 'naranhi',              // AndroidManifest.xml 의 <data android:scheme="naranhi"/>
+      pkg: 'app.sya.reading_log',     // 절대 안 바뀐다(app_info.dart)
+      store: 'https://play.google.com/store/apps/details?id=app.sya.reading_log'
+    };
+
+    var q = new URLSearchParams(location.search);
+    var code = (q.get('code') || '').replace(/[\s-]/g, '').toUpperCase();
+    var web = new URL('./?code=' + encodeURIComponent(code), location.href).href;
+    var $ = function (id) { return document.getElementById(id); };
 
     if (!code) {
-      document.getElementById('title').textContent = '초대코드가 없어요';
-      document.getElementById('msg').textContent = '받은 링크를 다시 확인해 주세요.';
+      $('title').textContent = '초대코드가 없어요';
+      $('msg').textContent = '받은 링크를 다시 확인해 주세요.';
+      $('toWeb').hidden = false;
+      return;
+    }
+    $('code').textContent = '초대코드 ' + code;
+    $('toWeb').href = web;
+    $('getApp').href = APP.store;
+
+    var android = /Android/i.test(navigator.userAgent);
+    if (q.get('to') === 'web' || !android) {
+      $('msg').textContent = '웹 나란히로 여는 중이에요…';
+      location.replace(web);
       return;
     }
 
-    var fallbackUrl = './?code=' + encodeURIComponent(code);
-    fallback.href = fallbackUrl;
+    // 앱이 있으면 곧장 앱으로(이 탭은 뒤로 밀린다). 없으면 크롬·카톡이 fallback(플레이스토어)으로 보낸다.
+    location.href = 'intent://join?code=' + encodeURIComponent(code)
+      + '#Intent;scheme=' + APP.scheme + ';package=' + APP.pkg
+      + ';S.browser_fallback_url=' + encodeURIComponent(APP.store) + ';end';
 
-    // 앱이 열리면 이 탭은 백그라운드로 밀려나고, 아래 타이머가 나중에 돌아도
-    // document.visibilityState 가 더는 'visible' 이 아니라 웹으로 밀어내지 않는다.
-    // 앱이 없으면(또는 못 열면) 화면은 계속 보이는 채고, 타이머가 웹으로 데려간다.
-    window.location.href = 'naranhi://join?code=' + encodeURIComponent(code);
+    // 1.5초 뒤에도 이 화면이 보이면(아무것도 안 열림) 손으로 고르게 한다.
     setTimeout(function () {
-      if (document.visibilityState === 'visible') {
-        window.location.replace(fallbackUrl);
-      }
-    }, 1200);
+      if (document.visibilityState !== 'visible') return;
+      $('title').textContent = '앱이 열리지 않았어요';
+      $('msg').textContent = '앱을 받은 뒤 받은 링크를 한 번 더 눌러 주세요. 아니면 웹으로 바로 들어갈 수 있어요.';
+      $('code').hidden = false;
+      $('getApp').hidden = false;
+      $('toWeb').hidden = false;
+    }, 1500);
   })();
 </script>
 </body>
