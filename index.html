@@ -25,6 +25,8 @@
   <base href="/naranhi/">
 
   <meta charset="UTF-8">
+  <!-- 로딩 표시가 처음부터 제 크기로 — Flutter 는 이 줄을 엔진이 뜬 뒤에야 넣어서, 그 전엔 아이폰이 980px 로 그려 아이콘이 작게 보였다가 커진다(2026-09-29) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="읽은 책을 책장에 꽂아 두는 독서기록 앱">
 
@@ -89,24 +91,37 @@
   </script>
 
   <!--
-    이전 빌드가 등록해 둔 서비스워커를 지운다. 나란히는 서비스워커를 끄고
-    빌드하는데(--pwa-strategy=none), 이미 아이폰 홈화면에 추가된 사람은 그 전에
-    등록된 서비스워커가 여전히 남아 있어 새 배포가 안 보이는 문제가 이어진다.
-    한 번 지우면 그다음부터는 애초에 등록이 안 되니 이 코드도 할 일이 없어진다.
+    🐌 앱 파일 캐시(web/sw.js · 2026-09-30 땀방울 본보기). 번호는 배포 때 tool/stamp_web.py 가 박는다 —
+    안 박혔으면(`_` 로 시작) 등록하지 않는다(그래서 잊어도 망가지지 않고 예전처럼 느릴 뿐이다).
 
-    🚨 **나란히 것만 지운다.** getRegistrations() 는 이 앱이 아니라 `sya-apps.github.io`
-    **전체**의 서비스워커를 준다. 거르지 않으면 이웃 앱(쿵짝·사랑나라 — 둘 다 오프라인에
-    서비스워커를 쓴다)까지 지워서, 나란히 웹을 한 번 열면 옆 앱들의 오프라인이 풀린다
-    (2026-09-11 ADMIN 발견).
+    🧹 옛 판이 남긴 **다른** 서비스워커(Flutter 기본 flutter_service_worker.js)는 지운다.
+    🚨 **나란히 것만** — getRegistrations() 는 `sya-apps.github.io` 전체를 준다. 거르지 않으면
+    이웃 앱(쿵짝·사랑나라·땀방울 …)의 워커까지 지운다(2026-09-11 ADMIN 발견). 우리 sw.js 는 남긴다.
   -->
   <script>
-    if ('serviceWorker' in navigator) {
+    (function () {
+      if (!('serviceWorker' in navigator)) return;
       navigator.serviceWorker.getRegistrations()
-        .then((regs) => regs
-          .filter((reg) => reg.scope.includes('/naranhi/'))
-          .forEach((reg) => reg.unregister()))
-        .catch(() => {});
-    }
+        .then(function (regs) {
+          regs.forEach(function (reg) {
+            var w = reg.active || reg.waiting || reg.installing;
+            var url = w ? w.scriptURL : '';
+            if (reg.scope.indexOf('/naranhi/') !== -1 && url.indexOf('/sw.js') === -1) reg.unregister();
+          });
+        })
+        .catch(function () {});
+      var B = 'dff95d1cae3e';
+      if (B.charAt(0) === '_') return;
+      navigator.serviceWorker.register('sw.js?b=' + B).catch(function () {});
+      addEventListener('flutter-first-frame', function () {
+        setTimeout(function () {
+          navigator.serviceWorker.ready.then(function (r) {
+            var list = performance.getEntriesByType('resource').map(function (e) { return e.name; });
+            if (r.active) r.active.postMessage({ warm: list });
+          }).catch(function () {});
+        }, 2000); // 첫 화면이 뜬 뒤 글꼴·그림까지 다 받은 다음에
+      });
+    })();
   </script>
 
   <!--
