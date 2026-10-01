@@ -80,6 +80,11 @@ self.addEventListener('fetch', (event) => {
 // 페이지가 첫 화면을 그린 뒤 보내 주는 «받은 파일 목록» — 없는 것만 채운다.
 // `no-cache` 로 받는다: 브라우저 캐시에 남은 **옛 판**을 새 캐시에 담지 않으려는 것이다(서버에 한 번 물어본다 · 같으면 304).
 self.addEventListener('message', (event) => {
+  // 사람이 「새 판 · 눌러서 바꾸기」 를 누른 때만 넘겨받는다 — 페이지가 곧바로 통째로 다시 열린다(index.html)
+  if (event.data && event.data.skip) {
+    self.skipWaiting();
+    return;
+  }
   const list = (event.data && event.data.warm) || [];
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);

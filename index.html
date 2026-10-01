@@ -110,9 +110,29 @@
           });
         })
         .catch(function () {});
-      var B = 'b6a7967e4d1c';
+      var B = '02ffb06d16f1';
       if (B.charAt(0) === '_') return;
-      navigator.serviceWorker.register('sw.js?b=' + B).catch(function () {});
+      // 🔄 새 판이 기다리고 있으면 아래에 띠를 띄운다 — 누르면 새 워커로 넘기고 통째로 다시 연다(판이 섞이지 않게 · ADMIN 10/1)
+      var asked = false;
+      function offer(w) {
+        if (!w || !navigator.serviceWorker.controller || document.getElementById('sya-update')) return;
+        var bar = document.createElement('button');
+        bar.id = 'sya-update';
+        bar.textContent = '새 판이 나왔어요 · 눌러서 바꾸기';
+        bar.style.cssText = 'position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));' +
+          'z-index:9999;padding:14px;border:0;border-radius:14px;background:#4F6B4A;color:#fff;font-size:16px;' +
+          'box-shadow:0 4px 16px rgba(0,0,0,.18)';
+        bar.onclick = function () { asked = true; bar.textContent = '바꾸는 중…'; w.postMessage({ skip: true }); };
+        document.body.appendChild(bar);
+      }
+      navigator.serviceWorker.addEventListener('controllerchange', function () { if (asked) location.reload(); });
+      navigator.serviceWorker.register('sw.js?b=' + B).then(function (reg) {
+        if (reg.waiting) offer(reg.waiting);
+        reg.addEventListener('updatefound', function () {
+          var w = reg.installing;
+          if (w) w.addEventListener('statechange', function () { if (w.state === 'installed') offer(w); });
+        });
+      }).catch(function () {});
       addEventListener('flutter-first-frame', function () {
         setTimeout(function () {
           navigator.serviceWorker.ready.then(function (r) {
