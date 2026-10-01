@@ -71,7 +71,8 @@ self.addEventListener('fetch', (event) => {
     const cache = await caches.open(CACHE);
     const hit = await cache.match(req, { ignoreSearch: true });
     if (hit) return hit;
-    const res = await fetch(req);
+    // 🪤 2026-10-01(학원비서 발견): 그냥 fetch 면 브라우저 HTTP 캐시의 옛 main.dart.js 를 집어 새 판 캐시에 박는다 → 띠를 눌러도 옛 화면
+    const res = await fetch(new Request(req, { cache: 'no-cache' }));
     if (res.ok && res.type === 'basic') cache.put(req, res.clone()).catch(() => {});
     return res;
   })());
