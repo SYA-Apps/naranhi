@@ -28,14 +28,14 @@ const FONTS = 'naranhi:gstatic';
 const PAGES = /\/(index\.html|join\.html|get\.html|privacy\.html|delete-account\.html)?$/;
 const NEVER = /\/(sw\.js|version\.json|flutter_service_worker\.js)$/;
 
-self.addEventListener('install', () => self.skipWaiting());
+// 🚨 skipWaiting · clients.claim 을 쓰지 않는다(2026-10-01 ADMIN · 사용자 승인) — 열린 앱에서 새 워커가 넘겨받으면 옛 main.dart.js 와 새 자료가 섞인다. 새 판은 앱을 완전히 닫았다 열 때 바뀐다.
+self.addEventListener('install', () => {});
 
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     for (const k of await caches.keys()) {
       if (k.startsWith(PREFIX) && k !== CACHE) await caches.delete(k); // FONTS 는 PREFIX 로 시작하지 않아 남는다
     }
-    await self.clients.claim();
   })());
 });
 
