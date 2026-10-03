@@ -111,10 +111,11 @@
           });
         })
         .catch(function () {});
-      var B = 'e8b42056924a';
+      var B = '96ae40dd98cf';
       if (B.charAt(0) === '_') return;
       // 🔄 새 판이 기다리고 있으면 아래에 띠를 띄운다 — 누르면 새 워커로 넘기고 통째로 다시 연다(판이 섞이지 않게 · ADMIN 10/1)
       var asked = false;
+      var swReg = null;
       var T = {
         font: 'assets/assets/fonts/GowunDodum-Regular.ttf', // 앱 제목 글씨체 파일(빌드 결과 안 경로 — base-href 기준 상대)
         icon: '📚', title: '새 판이 나왔어요', sub: '눌러서 바꿔요', btn: '바꾸기',
@@ -160,13 +161,14 @@
           bar.querySelector('b').textContent = '바꾸는 중이에요…';
           bar.querySelector('small').textContent = '잠깐이면 돼요';
           bar.querySelector('.b').innerHTML = '<span class="s"></span>';
-          w.postMessage({ skip: true });
+          (swReg && swReg.waiting || w).postMessage({ skip: true });
         };
         document.body.appendChild(bar);
         requestAnimationFrame(function () { requestAnimationFrame(function () { bar.classList.add('on'); }); });
       }
       navigator.serviceWorker.addEventListener('controllerchange', function () { if (asked) location.reload(); });
       navigator.serviceWorker.register('sw.js?b=' + B).then(function (reg) {
+        swReg = reg;
         if (reg.waiting) offer(reg.waiting);
         reg.addEventListener('updatefound', function () {
           var w = reg.installing;
