@@ -1,120 +1,97 @@
 <!DOCTYPE html>
 <!--
-  나란히 받기 페이지 — 친구에게 앱을 권할 때 보내는 링크(공개).
-
-  앱·웹의 "앱 추천하기" 가 이 주소(AppInfo.getUrl) 하나를 공유 시트로 보낸다.
-  친구는 여기서 자기 기기를 고른다:
-    - 갤럭시(안드로이드) → 구글 플레이 스토어
-    - 아이폰 · PC       → 웹으로 열고(아이폰은 "홈 화면에 추가")
-
-  **아이폰 앱이 나오면**: 아래 아이폰 버튼의 href 를 App Store 주소로만 바꾸면 된다.
-  그때는 PC 를 이 버튼에서 떼어 내야 한다 — 지금 둘이 한 줄인 건 갈 곳이 같아서다.
-
-  **길은 딱 둘만 둔다(2026-08-31).** 예전엔 맨 아래 "기기 상관없이 · 웹으로 바로
-  시작하기" 링크가 하나 더 있었는데 뺐다. 출시 전에는 플레이 주소가 안 열려서 그게
-  유일한 길이었지만, 정식 출시(08-18) 뒤로는 **설치를 우회하는 샛길**이 된다.
-  갤럭시 사용자가 그걸 누르면 앱을 안 깔고 웹만 쓰고 끝난다 — 설치수도, 다시
-  돌아올 확률도 잃는다. 고를 것이 적어야 고른다.
-
-  privacy.html·delete-account.html 과 같은 자리(스타일도 같은 레몬크림·잉크).
-  `flutter build web` 이 그대로 복사하므로 배포 한 번이면 아래로 공개된다.
-      https://sya-apps.github.io/naranhi/get.html
+  나란히 받기 페이지 - 「친구에게 추천하기」 글에 들어가는 링크 하나.
+    https://sya-apps.github.io/naranhi/get.html
+  안드로이드: 1.5초 뒤 Google Play 로 자동 이동(+ 단추 둘)  /  아이폰·아이패드: 자동 이동 없음, 안내 그림을 읽을 시간
+  PC: 1.5초 뒤 웹으로  /  주소 뒤 ?stay 를 붙이면 자동 이동을 끈다(시험용)
+  카톡 미리보기는 아래 og 태그를 쓴다(Play 주소는 카톡이 미리보기를 못 만들어서 이 페이지가 대신한다).
+  본보기: 학원시간표 web/get.html · 디자인은 이 앱 것(레몬크림 · 진갈색 잉크 · 세이지 · 고운돋움)
+  앱의 AppInfo.getUrl 이 이 주소다. 사용자에게 보이는 글에는 「」만 쓴다.
 -->
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>나란히 받기</title>
+  <meta name="description" content="읽은 책을 책장에 꽂고, 친구와 함께 보는 독서 앱이에요.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="나란히">
+  <meta property="og:title" content="나란히 - 함께 쓰는 독서 책장">
+  <meta property="og:description" content="읽은 책을 책장에 꽂고, 친구와 함께 봐요. 누르면 바로 받아요.">
+  <meta property="og:image" content="https://sya-apps.github.io/naranhi/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="나란히 앱 아이콘">
+  <meta property="og:url" content="https://sya-apps.github.io/naranhi/get.html">
+  <meta property="og:locale" content="ko_KR">
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
   <style>
-    :root {
-      --cream: #FBF3D6;
-      --paper: #FFFDF5;
-      --ink: #4A3B36;
+    @font-face{font-family:"Gowun Dodum";src:url("assets/assets/fonts/GowunDodum-Regular.ttf") format("truetype");font-display:swap}
+    :root{
+      --paper:#FBF3D6; --card:#FFFDF5; --ink:#4A3B36; --soft:#847169; --brand:#6E8B66; --on:#FFFFFF; --line:#E8DFC6;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      padding: 40px 18px 72px;
-      background: var(--cream);
-      color: var(--ink);
-      font-family: system-ui, -apple-system, "Apple SD Gothic Neo",
-                   "Malgun Gothic", sans-serif;
-      line-height: 1.7;
-      word-break: keep-all;
-      text-align: center;
+    @media (prefers-color-scheme:dark){
+      :root{--paper:#211C18; --card:#2E2823; --ink:#F1E8DB; --soft:#B9AA9C; --brand:#A9C29F; --on:#211C18; --line:#3D362F}
     }
-    main { max-width: 420px; margin: 0 auto; }
-    .icon {
-      width: 96px; height: 96px;
-      border-radius: 22px;
-      border: 1.5px solid var(--ink);
-      display: block; margin: 0 auto 18px;
-    }
-    h1 { font-size: 1.7rem; margin: 0 0 4px; }
-    .sub { color: rgba(74, 59, 54, .65); margin: 0 0 32px; }
-    a.btn {
-      display: flex; align-items: center; gap: 14px;
-      text-align: left;
-      text-decoration: none;
-      color: var(--ink);
-      background: var(--paper);
-      border: 1.5px solid var(--ink);
-      border-radius: 16px;
-      padding: 16px 20px;
-      margin: 0 0 14px;
-    }
-    a.btn:active { transform: translateY(1px); }
-    .btn .emoji { font-size: 1.7rem; line-height: 1; }
-    .btn .label { font-weight: 700; font-size: 1.05rem; }
-    .btn .note { color: rgba(74, 59, 54, .6); font-size: .82rem; }
-    .btn .col { display: flex; flex-direction: column; }
-    .foot {
-      margin-top: 30px; font-size: .85rem;
-      color: rgba(74, 59, 54, .6);
-    }
-    .ios-tip {
-      margin-top: 22px; font-size: .85rem;
-      color: rgba(74, 59, 54, .7);
-      background: var(--paper);
-      border: 1px solid rgba(74, 59, 54, .18);
-      border-radius: 12px; padding: 12px 16px; text-align: left;
-    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--paper);color:var(--ink);
+      font-family:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;text-align:center}
+    main{max-width:420px;margin:0 auto;padding:56px 20px 40px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:28px 20px 22px}
+    .icon{width:96px;height:96px;border-radius:22px;display:block;margin:0 auto 14px}
+    h1{font-size:1.65rem;margin:0 0 6px;font-weight:400}
+    .lead{margin:0 0 18px;color:var(--soft);font-size:1.02rem;line-height:1.5}
+    #msg{min-height:1.5em;margin:0 0 16px;color:var(--soft);font-size:.95rem;line-height:1.5}
+    .btn{display:block;text-decoration:none;background:var(--brand);color:var(--on);border-radius:16px;
+      padding:15px 14px;margin:10px 0;font-size:1.05rem;font-family:inherit}
+    .btn.sub{background:transparent;color:var(--ink);border:1.5px solid var(--brand)}
+    #guide{display:none;margin-top:16px}
+    #guide img{width:100%;height:auto;border-radius:14px;display:block}
+    .foot{margin-top:18px;font-size:.8rem;color:var(--soft)}
   </style>
 </head>
 <body>
 <main>
-  <img class="icon" src="icons/Icon-192.png" alt="나란히 아이콘">
-  <h1>나란히</h1>
-  <p class="sub">함께 쓰는 독서 책장</p>
-
-  <!-- 갤럭시(안드로이드) → 구글 플레이. 2026-08-18 정식 출시로 열려 있다. -->
-  <a class="btn" href="https://play.google.com/store/apps/details?id=app.sya.reading_log">
-    <span class="emoji">🤖</span>
-    <span class="col">
-      <span class="label">갤럭시 · 안드로이드</span>
-      <span class="note">구글 플레이 스토어에서 받기</span>
-    </span>
-  </a>
-
-  <!-- 아이폰·PC → 웹으로. 둘의 갈 곳이 같아서 한 줄로 묶었다(같은 웹 나란히).
-       iOS 앱이 나오면 이 href 만 App Store 주소로 바꾸고 PC 는 따로 떼어 낸다. -->
-  <a class="btn" href="./">
-    <span class="emoji">🌐</span>
-    <span class="col">
-      <span class="label">아이폰 · PC</span>
-      <span class="note">설치 없이 웹으로 바로 쓰기</span>
-    </span>
-  </a>
-
-  <div class="ios-tip">
-    <strong>아이폰에서 앱처럼 쓰기</strong><br>
-    사파리로 열고 아래 <strong>공유</strong> 버튼 → <strong>홈 화면에 추가</strong> 를
-    누르면, 나란히 아이콘이 홈 화면에 생겨요.
+  <div class="card">
+    <img class="icon" src="icons/Icon-192.png" alt="나란히 앱 아이콘" width="96" height="96">
+    <h1>나란히</h1>
+    <p class="lead">읽은 책을 책장에 꽂고<br>친구와 함께 봐요</p>
+    <p id="msg">기기를 확인하고 있어요</p>
+    <a id="go" class="btn" href="./">바로 열기</a>
+    <a id="alt" class="btn sub" href="./" style="display:none"></a>
+    <div id="guide">
+      <img src="https://sya-apps.github.io/guide/ios-add-to-home.png" alt="아이폰에서 앱처럼 쓰기 안내 그림"
+           onerror="this.parentNode.style.display='none';document.getElementById('guideText').style.display='block'">
+    </div>
+    <p id="guideText" class="foot" style="display:none">사파리 아래 공유 단추를 누르고 「홈 화면에 추가」를 고르면 앱처럼 써요.</p>
   </div>
-
-  <p class="foot">읽은 책을 책장에 꽂고, 오늘 진도를 친구와 나눠요.</p>
+  <p class="foot">회원가입 없이 바로 써요</p>
 </main>
+<script>
+  /* 주소 뒤에 ?stay 를 붙이면 자동으로 넘어가지 않고 이 화면에 머문다(시험용) */
+  var ua = navigator.userAgent;
+  var android = /Android/i.test(ua);
+  var iphone = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
+  var stay = /[?&]stay/.test(location.search);
+  var play = 'https://play.google.com/store/apps/details?id=app.sya.reading_log';
+  var web = 'https://sya-apps.github.io/naranhi/';
+  var go = document.getElementById('go'), alt = document.getElementById('alt'), msg = document.getElementById('msg');
+  if (android) {
+    msg.textContent = '안드로이드예요. Google Play로 가서 앱을 받아요.';
+    go.textContent = 'Google Play에서 앱 받기'; go.href = play;
+    alt.style.display = 'block'; alt.textContent = '웹으로 먼저 써 보기'; alt.href = web;
+    if (!stay) setTimeout(function () { location.href = play; }, 1500);
+  } else if (iphone) {
+    /* 아이폰은 자동으로 넘기지 않는다: 안내를 읽을 시간이 필요하다 */
+    msg.textContent = '아이폰이에요. 웹으로 열고 홈 화면에 추가하면 앱처럼 써요.';
+    go.textContent = '웹으로 열기'; go.href = web;
+    document.getElementById('guide').style.display = 'block';
+  } else {
+    msg.textContent = '컴퓨터예요. 웹으로 열어요.';
+    go.textContent = '웹으로 열기'; go.href = web;
+    if (!stay) setTimeout(function () { location.href = web; }, 1500);
+  }
+</script>
 </body>
 </html>
