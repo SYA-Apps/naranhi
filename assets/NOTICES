@@ -2720,6 +2720,7 @@ file_selector_web
 file_selector_windows
 flutter_plugin_android_lifecycle
 google_sign_in_android
+google_sign_in_ios
 image_picker_for_web
 image_picker_macos
 image_picker_platform_interface
